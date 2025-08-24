@@ -2,6 +2,7 @@ package storage
 
 import (
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -12,7 +13,18 @@ const (
 type FileStorage struct{}
 
 func NewFileStorage() *FileStorage {
+	err := os.MkdirAll(hashPath, 0755)
+
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
+
 	return &FileStorage{}
+}
+
+func (s *FileStorage) CreateHashPath() error {
+	return os.MkdirAll(hashPath, 0755)
 }
 
 func (s *FileStorage) SaveHash(hash string) error {
