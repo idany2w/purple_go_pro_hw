@@ -13,6 +13,7 @@ type Config struct {
 }
 
 type ServerConfig struct {
+	Host string
 	Port string
 }
 
@@ -32,6 +33,7 @@ func NewConfig() *Config {
 
 	return &Config{
 		Server: ServerConfig{
+			Host: os.Getenv("SERVER_HOST"),
 			Port: os.Getenv("SERVER_PORT"),
 		},
 		Email: EmailConfig{

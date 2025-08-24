@@ -2,6 +2,7 @@ package verify
 
 import (
 	"demo/validation/configs"
+	"demo/validation/pkg/request"
 	"demo/validation/pkg/response"
 	"net/http"
 )
@@ -28,41 +29,42 @@ func NewVerifyHandler(router *http.ServeMux, deps VerifyHandlerDeps) {
 
 func (h *VerifyHandler) send() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		hash := h.VerifyService.GenerateHash(r.FormValue("email"))
-		err := h.VerifyService.SendEmail("test@test.com", hash)
-
-		res := VerifySendEmailResponse{
-			Status:  "success",
-			Error:   "",
-			Message: "Email sent",
-		}
+		res := response.Response{}
+		body, _ := request.HandleBody[VerifySendEmailRequest](w, r)
+		err := h.VerifyService.VerifyEmail(body.Email)
 
 		if err != nil {
-			res.Status = "error"
+			res.Status = response.StatusError
 			res.Error = err.Error()
+			response.SendJsonResponse(w, res, http.StatusInternalServerError)
 			return
 		}
 
+		res.Status = response.StatusSuccess
+		res.Message = "Email sent"
 		response.SendJsonResponse(w, res, http.StatusOK)
 	}
 }
 
 func (h *VerifyHandler) verify() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		isVerified := true
+		res := response.Response{}
+		hash := r.PathValue("hash")
+		isVerified := h.VerifyService.VerifyHash(hash)
 
-		res := VerifyHashResponse{
-			Status:  "success",
-			Error:   "",
-			Message: "Email verified",
+		res.Data = VerifyHashRequest{
+			IsVerified: isVerified,
 		}
 
-		if isVerified {
-			response.SendJsonResponse(w, res, http.StatusOK)
-		} else {
-			res.Status = "error"
-			res.Error = "Email not verified"
-			response.SendJsonResponse(w, res, http.StatusOK)
+		if !isVerified {
+			res.Status = response.StatusError
+			res.Error = "Is not verified"
+			response.SendJsonResponse(w, res, http.StatusNotFound)
+			return
 		}
+
+		res.Status = response.StatusSuccess
+		res.Message = "Email verified"
+		response.SendJsonResponse(w, res, http.StatusOK)
 	}
 }
