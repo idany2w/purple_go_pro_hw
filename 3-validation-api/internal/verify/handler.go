@@ -23,7 +23,7 @@ func NewVerifyHandler(router *http.ServeMux, deps VerifyHandlerDeps) {
 	}
 
 	router.HandleFunc("POST /send", handler.send())
-	router.HandleFunc("POST /verify/{hash}", handler.verify())
+	router.HandleFunc("GET /verify/{hash}", handler.verify())
 }
 
 func (h *VerifyHandler) send() http.HandlerFunc {
