@@ -2,7 +2,7 @@ package main
 
 import (
 	"demo/order-api/configs"
-	"demo/order-api/internal/order"
+	"demo/order-api/internal/product"
 	"demo/order-api/pkg/db"
 	"fmt"
 	"net/http"
@@ -14,12 +14,12 @@ func main() {
 	db := db.NewDB(config)
 
 	// Register repositories
-	orderRepository := order.NewOrderRepository(db.Db)
+	productRepository := product.NewProductRepository(db.Db)
 
 	// Register handlers
-	order.NewOrderHandler(router, order.OrderHandlerDeps{
-		Config:          config,
-		OrderRepository: orderRepository,
+	product.NewProductHandler(router, product.ProductHandlerDeps{
+		Config:            config,
+		ProductRepository: productRepository,
 	})
 
 	server := &http.Server{

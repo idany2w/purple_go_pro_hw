@@ -1,11 +1,11 @@
-package order
+package product
 
 import (
 	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
-type Order struct {
+type Product struct {
 	gorm.Model
 	Name        string         `gorm:"not null"`
 	Description string         `gorm:"type:text"`
