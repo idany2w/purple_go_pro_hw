@@ -9,7 +9,7 @@ import (
 )
 
 type DB struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 func NewDB(config *configs.Config) *DB {
@@ -28,9 +28,9 @@ func NewDB(config *configs.Config) *DB {
 		panic(err)
 	}
 
-	return &DB{db: db}
+	return &DB{Db: db}
 }
 
 func (d *DB) Migrate(model interface{}) {
-	d.db.AutoMigrate(model)
+	d.Db.AutoMigrate(model)
 }

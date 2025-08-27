@@ -1,28 +1,23 @@
 package request
 
 import (
-	"demo/order-api/pkg/response"
 	"net/http"
+
+	"demo/order-api/pkg/response"
 )
 
 func HandleBody[T any](w http.ResponseWriter, r *http.Request) (*T, error) {
-	res := response.Response{}
-
 	body, err := Decode[T](r.Body)
 
 	if err != nil {
-		res.Status = "error"
-		res.Error = err.Error()
-		response.SendJsonResponse(w, res, http.StatusBadRequest)
+		response.SendJsonError(&w, err.Error(), http.StatusBadRequest)
 		return nil, err
 	}
 
 	err = IsValid(body)
 
 	if err != nil {
-		res.Status = "error"
-		res.Error = err.Error()
-		response.SendJsonResponse(w, res, http.StatusBadRequest)
+		response.SendJsonError(&w, err.Error(), http.StatusBadRequest)
 		return nil, err
 	}
 

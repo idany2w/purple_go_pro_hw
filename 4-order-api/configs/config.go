@@ -7,7 +7,13 @@ import (
 )
 
 type Config struct {
-	Db DbConfig
+	Server ServerConfig
+	Db     DbConfig
+}
+
+type ServerConfig struct {
+	Host string
+	Port string
 }
 
 type DbConfig struct {
@@ -27,6 +33,10 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
+		Server: ServerConfig{
+			Host: os.Getenv("SERVER_HOST"),
+			Port: os.Getenv("SERVER_PORT"),
+		},
 		Db: DbConfig{
 			Host:     os.Getenv("POSTGRES_HOST"),
 			Port:     os.Getenv("POSTGRES_PORT"),
