@@ -1,0 +1,17 @@
+services:
+  postgres:
+    container_name: postgres_order_api
+    image: postgres:16.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres-data:/data/postgres
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+volumes:
+  postgres-data:
+    driver: local
