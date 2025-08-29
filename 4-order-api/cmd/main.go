@@ -2,8 +2,11 @@ package main
 
 import (
 	"demo/order-api/configs"
+	"demo/order-api/internal/auth"
 	"demo/order-api/internal/product"
+	"demo/order-api/internal/sms"
 	"demo/order-api/pkg/db"
+	"demo/order-api/pkg/jwt"
 	"demo/order-api/pkg/middleware"
 	"fmt"
 	"net/http"
@@ -20,7 +23,16 @@ func main() {
 	// Register repositories
 	productRepository := product.NewProductRepository(db.Db)
 
+	// Register services
+	smsService := sms.NewSmsService(db.Db)
+
 	// Register handlers
+	auth.NewAuthHandler(router, auth.AuthHandlerDeps{
+		Config:     config,
+		SmsService: smsService,
+		JWT:        jwt.NewJWT(config.Jwt.Key),
+	})
+
 	product.NewProductHandler(router, product.ProductHandlerDeps{
 		Config:            config,
 		ProductRepository: productRepository,
