@@ -47,7 +47,7 @@ func (h *AuthHandler) login() http.HandlerFunc {
 			return
 		}
 
-		token, err := h.JWT.Create(body.Phone)
+		token, err := h.JWT.Create(jwt.JwtData{Phone: body.Phone})
 		if err != nil {
 			response.SendJsonError(&w, err.Error(), http.StatusInternalServerError)
 			return
