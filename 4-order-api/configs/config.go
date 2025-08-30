@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Server ServerConfig
 	Db     DbConfig
+	Jwt    JwtConfig
 }
 
 type ServerConfig struct {
@@ -23,6 +24,10 @@ type DbConfig struct {
 	Password string
 	DbName   string
 	SSLMode  string
+}
+
+type JwtConfig struct {
+	Key string
 }
 
 func LoadConfig() *Config {
@@ -44,6 +49,9 @@ func LoadConfig() *Config {
 			Password: os.Getenv("POSTGRES_PASSWORD"),
 			DbName:   os.Getenv("POSTGRES_DB"),
 			SSLMode:  os.Getenv("POSTGRES_SSL_MODE"),
+		},
+		Jwt: JwtConfig{
+			Key: os.Getenv("JWT_KEY"),
 		},
 	}
 }
