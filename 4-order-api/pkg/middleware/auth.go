@@ -41,5 +41,5 @@ func Auth(next http.Handler, config *configs.Config) http.Handler {
 }
 
 func Fail(w *http.ResponseWriter) {
-	response.SendJsonError(*w, "Unauthorized", http.StatusUnauthorized)
+	response.SendJsonError(w, "Unauthorized", http.StatusUnauthorized)
 }
