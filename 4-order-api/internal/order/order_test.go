@@ -2,7 +2,6 @@ package order
 
 import (
 	"testing"
-	"time"
 )
 
 func TestOrderStatusConstants(t *testing.T) {
@@ -53,8 +52,6 @@ func TestOrderResponseMapping(t *testing.T) {
 	order := &Order{
 		Status:      OrderStatusPending,
 		TotalAmount: 150.0,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
 	}
 
 	// Создаем тестовые элементы заказа

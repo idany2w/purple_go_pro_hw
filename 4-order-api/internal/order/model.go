@@ -12,23 +12,21 @@ import (
 type Order struct {
 	gorm.Model
 	UserID      uint        `gorm:"not null"`
-	User        user.User   `gorm:"foreignKey:UserID"`
+	User        user.User   `gorm:"foreignKey:UserID;references:ID"`
 	Status      OrderStatus `gorm:"type:varchar(20);default:'pending'"`
 	TotalAmount float64     `gorm:"type:decimal(10,2);not null"`
 	OrderItems  []OrderItem `gorm:"foreignKey:OrderID"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 }
 
 // OrderItem представляет элемент заказа (связь между заказом и продуктом)
 type OrderItem struct {
 	gorm.Model
-	OrderID   uint           `gorm:"not null"`
-	Order     Order          `gorm:"foreignKey:OrderID"`
-	ProductID uint           `gorm:"not null"`
-	Product   product.Product `gorm:"foreignKey:ProductID"`
-	Quantity  int            `gorm:"not null;default:1"`
-	Price     float64        `gorm:"type:decimal(10,2);not null"`
+	OrderID   uint            `gorm:"not null"`
+	Order     Order           `gorm:"foreignKey:OrderID;references:ID"`
+	ProductID uint            `gorm:"not null"`
+	Product   product.Product `gorm:"foreignKey:ProductID;references:ID"`
+	Quantity  int             `gorm:"not null;default:1"`
+	Price     float64         `gorm:"type:decimal(10,2);not null"`
 }
 
 // OrderStatus представляет статус заказа
@@ -60,8 +58,8 @@ type OrderResponse struct {
 
 // OrderItemResponse представляет ответ с информацией об элементе заказа
 type OrderItemResponse struct {
-	ID       uint                `json:"id"`
-	Product  product.Product     `json:"product"`
-	Quantity int                 `json:"quantity"`
-	Price    float64             `json:"price"`
+	ID       uint            `json:"id"`
+	Product  product.Product `json:"product"`
+	Quantity int             `json:"quantity"`
+	Price    float64         `json:"price"`
 }
