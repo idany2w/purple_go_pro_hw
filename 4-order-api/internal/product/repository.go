@@ -64,3 +64,15 @@ func (r *ProductRepository) Delete(id uint) error {
 
 	return nil
 }
+
+// GetProductsByIDs получает продукты по их ID
+func (r *ProductRepository) GetProductsByIDs(ids []uint) ([]Product, error) {
+	var products []Product
+	err := r.DB.Where("id IN ?", ids).Find(&products).Error
+	
+	if err != nil {
+		return nil, err
+	}
+	
+	return products, nil
+}
