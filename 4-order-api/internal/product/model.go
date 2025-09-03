@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Product представляет продукт в системе
 type Product struct {
 	gorm.Model
 	Name        string         `gorm:"not null"`
