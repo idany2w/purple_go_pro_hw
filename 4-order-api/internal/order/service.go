@@ -2,15 +2,25 @@ package order
 
 import (
 	"demo/order-api/internal/product"
+	"demo/order-api/internal/user"
 	"errors"
 	"fmt"
 )
 
-type OrderService struct {
-	orderRepository *OrderRepository
+// OrderRepositoryInterface определяет интерфейс для OrderRepository
+type OrderRepositoryInterface interface {
+	GetUserByPhone(phone string) (*user.User, error)
+	GetProductsByIDs(ids []uint) ([]product.Product, error)
+	CreateOrder(order *Order) error
+	GetOrderByID(orderID uint) (*Order, error)
+	GetOrdersByUserID(userID uint) ([]Order, error)
 }
 
-func NewOrderService(orderRepository *OrderRepository) *OrderService {
+type OrderService struct {
+	orderRepository OrderRepositoryInterface
+}
+
+func NewOrderService(orderRepository OrderRepositoryInterface) *OrderService {
 	return &OrderService{
 		orderRepository: orderRepository,
 	}
@@ -22,34 +32,34 @@ func (s *OrderService) CreateOrder(userPhone string, request *CreateOrderRequest
 	if len(request.ProductIDs) != len(request.Quantities) {
 		return nil, errors.New("product_ids and quantities arrays must have the same length")
 	}
-	
+
 	if len(request.ProductIDs) == 0 {
 		return nil, errors.New("at least one product is required")
 	}
-	
+
 	// Получаем пользователя
 	user, err := s.orderRepository.GetUserByPhone(userPhone)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
-	
+
 	// Получаем продукты
 	products, err := s.orderRepository.GetProductsByIDs(request.ProductIDs)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get products: %w", err)
 	}
-	
+
 	if len(products) != len(request.ProductIDs) {
 		return nil, errors.New("some products not found")
 	}
-	
+
 	// Создаем заказ
 	order := &Order{
 		UserID:      user.ID,
 		Status:      OrderStatusPending,
 		TotalAmount: 0,
 	}
-	
+
 	// Создаем элементы заказа
 	var totalAmount float64
 	for i, productID := range request.ProductIDs {
@@ -57,7 +67,7 @@ func (s *OrderService) CreateOrder(userPhone string, request *CreateOrderRequest
 		if quantity <= 0 {
 			return nil, fmt.Errorf("invalid quantity for product %d", productID)
 		}
-		
+
 		// Находим продукт для получения цены
 		var product *product.Product
 		for _, p := range products {
@@ -66,33 +76,33 @@ func (s *OrderService) CreateOrder(userPhone string, request *CreateOrderRequest
 				break
 			}
 		}
-		
+
 		if product == nil {
 			return nil, fmt.Errorf("product %d not found", productID)
 		}
-		
+
 		// Здесь должна быть логика получения цены продукта
 		// Для демонстрации используем фиксированную цену
 		price := 100.0 // В реальном приложении цена должна браться из продукта
-		
+
 		orderItem := OrderItem{
 			ProductID: productID,
 			Quantity:  quantity,
 			Price:     price,
 		}
-		
+
 		order.OrderItems = append(order.OrderItems, orderItem)
 		totalAmount += price * float64(quantity)
 	}
-	
+
 	order.TotalAmount = totalAmount
-	
+
 	// Сохраняем заказ в базе данных
 	err = s.orderRepository.CreateOrder(order)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create order: %w", err)
 	}
-	
+
 	return order, nil
 }
 
@@ -107,6 +117,6 @@ func (s *OrderService) GetOrdersByUser(userPhone string) ([]Order, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
-	
+
 	return s.orderRepository.GetOrdersByUserID(user.ID)
 }
